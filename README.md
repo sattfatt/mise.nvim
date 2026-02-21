@@ -31,7 +31,7 @@ Deep integration with [snacks.nvim](https://github.com/folke/snacks.nvim) picker
 
 ```lua
 {
-  "your-username/mise-nvim",
+  "sattfatt/mise.nvim",
   lazy = false,       -- load eagerly for statusline/autocmds
   priority = 100,
   dependencies = {
