@@ -1,0 +1,110 @@
+local helpers = require("tests.helpers")
+
+describe("mise.config", function()
+  before_each(function()
+    helpers.reset_mise()
+  end)
+
+  describe("defaults", function()
+    it("has expected default mise_path", function()
+      local config = require("mise.config")
+      config.setup()
+      assert.equals("mise", config.get().mise_path)
+    end)
+
+    it("has expected default cwd mode", function()
+      local config = require("mise.config")
+      config.setup()
+      assert.equals("cwd", config.get().cwd)
+    end)
+
+    it("has autocmds enabled by default", function()
+      local config = require("mise.config")
+      config.setup()
+      local cfg = config.get()
+      assert.is_true(cfg.autocmds.watch_config)
+      assert.is_true(cfg.autocmds.notify_on_dir_change)
+    end)
+
+    it("has terminal split horizontal by default", function()
+      local config = require("mise.config")
+      config.setup()
+      assert.equals("horizontal", config.get().terminal.split)
+    end)
+
+    it("has pickers table with all expected keys", function()
+      local config = require("mise.config")
+      config.setup()
+      local pickers = config.get().pickers
+      assert.is_table(pickers.tools)
+      assert.is_table(pickers.tasks)
+      assert.is_table(pickers.registry)
+      assert.is_table(pickers.versions)
+      assert.is_table(pickers.plugins)
+      assert.is_table(pickers.config)
+      assert.is_table(pickers.env)
+      assert.is_table(pickers.outdated)
+    end)
+  end)
+
+  describe("setup(opts)", function()
+    it("overrides mise_path", function()
+      local config = require("mise.config")
+      config.setup({ mise_path = "/usr/local/bin/mise" })
+      assert.equals("/usr/local/bin/mise", config.get().mise_path)
+    end)
+
+    it("overrides cwd mode", function()
+      local config = require("mise.config")
+      config.setup({ cwd = "root" })
+      assert.equals("root", config.get().cwd)
+    end)
+
+    it("deep-merges terminal options", function()
+      local config = require("mise.config")
+      config.setup({ terminal = { height = 20 } })
+      local cfg = config.get()
+      -- height is overridden
+      assert.equals(20, cfg.terminal.height)
+      -- other terminal fields remain at defaults
+      assert.equals("horizontal", cfg.terminal.split)
+    end)
+
+    it("deep-merges autocmds options", function()
+      local config = require("mise.config")
+      config.setup({ autocmds = { watch_config = false } })
+      local cfg = config.get()
+      assert.is_false(cfg.autocmds.watch_config)
+      -- other field unchanged
+      assert.is_true(cfg.autocmds.notify_on_dir_change)
+    end)
+
+    it("preserves defaults for unspecified keys", function()
+      local config = require("mise.config")
+      config.setup({ mise_path = "custom-mise" })
+      local cfg = config.get()
+      -- only mise_path changed
+      assert.equals("custom-mise", cfg.mise_path)
+      assert.equals("cwd", cfg.cwd)
+      assert.equals("horizontal", cfg.terminal.split)
+    end)
+
+    it("does not mutate defaults on successive calls", function()
+      local config = require("mise.config")
+      config.setup({ mise_path = "first" })
+      assert.equals("first", config.get().mise_path)
+
+      -- Reset between calls by re-requiring after cache clear
+      helpers.reset_mise()
+      config = require("mise.config")
+      config.setup({ mise_path = "second" })
+      assert.equals("second", config.get().mise_path)
+
+      -- Fresh setup should use defaults again
+      helpers.reset_mise()
+      config = require("mise.config")
+      config.setup()
+      assert.equals("mise", config.get().mise_path)
+    end)
+  end)
+end)
