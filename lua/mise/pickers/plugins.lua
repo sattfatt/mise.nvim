@@ -18,12 +18,16 @@ local function _pick(mode, caller_opts)
     and { "plugins", "ls-remote" }
     or  { "plugins", "ls" }
 
+  -- Capture cwd synchronously before the async finder runs
+  local cwd = util.cwd()
+
   ---@type snacks.picker.finder
   local function finder(fopts, ctx)
     return require("snacks.picker.source.proc").proc(
       ctx:opts({
         cmd  = util.mise_bin(),
         args = args,
+        cwd  = cwd,
         transform = function(item)
           local text = vim.trim(item.text)
           if text == "" then

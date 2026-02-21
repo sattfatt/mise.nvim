@@ -16,8 +16,10 @@ function M.pick(opts)
 
   ---@type snacks.picker.finder
   local function finder(_opts, _ctx)
+    -- Capture cwd synchronously before entering the async callback
+    local cwd = util.cwd()
     return function(cb)
-      local stdout, _, code = util.run({ "env", "-J" })
+      local stdout, _, code = util.run({ "env", "-J" }, { cwd = cwd })
       if code ~= 0 then
         util.notify("mise env failed", vim.log.levels.ERROR)
         return

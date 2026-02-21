@@ -16,12 +16,16 @@ function M.pick(opts)
 
   local default_action = opts.default_action or "install"
 
+  -- Capture cwd synchronously before the async finder runs
+  local cwd = util.cwd()
+
   ---@type snacks.picker.finder
   local function finder(fopts, ctx)
     return require("snacks.picker.source.proc").proc(
       ctx:opts({
         cmd  = util.mise_bin(),
         args = { "registry" },
+        cwd  = cwd,
         transform = function(item)
           local line = item.text
           if line == "" or line:match("^%s*$") then

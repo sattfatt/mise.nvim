@@ -22,9 +22,12 @@ function M.pick(opts)
   local cfg = require("mise.config").get()
   local picker_opts = vim.tbl_deep_extend("force", cfg.pickers.versions or {}, opts)
 
+  -- Capture cwd synchronously (used for both the pre-fetch and the proc finder)
+  local cwd = util.cwd()
+
   -- Pre-fetch installed versions for this tool to show badges
   local installed_versions = {} ---@type table<string, boolean>
-  local ls_stdout, _, ls_code = util.run({ "ls", "--json" })
+  local ls_stdout, _, ls_code = util.run({ "ls", "--json" }, { cwd = cwd })
   if ls_code == 0 then
     local data = util.json_decode(ls_stdout)
     if data and data[tool] and type(data[tool]) == "table" then
@@ -42,6 +45,7 @@ function M.pick(opts)
       ctx:opts({
         cmd  = util.mise_bin(),
         args = { "ls-remote", tool },
+        cwd  = cwd,
         transform = function(item)
           local ver = vim.trim(item.text)
           if ver == "" then
