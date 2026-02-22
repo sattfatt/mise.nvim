@@ -92,7 +92,7 @@ function M.pick(opts)
 
   Snacks.picker.pick(vim.tbl_deep_extend("force", {
     title   = "Mise Outdated Tools",
-    finder  = items,
+    finder  = function() return items end,
     format  = format,
     preview = "preview",
     matcher = { fuzzy = true, smartcase = true },

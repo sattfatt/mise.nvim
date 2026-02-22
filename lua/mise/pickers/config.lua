@@ -46,7 +46,12 @@ function M.pick(opts)
   ---@type snacks.picker.format
   local function format(item, _picker)
     local ret = {}
-    local icon, icon_hl = item.exists and (" ", "SnacksPickerIcon") or (" ", "DiagnosticError")
+    local icon, icon_hl
+    if item.exists then
+      icon, icon_hl = " ", "SnacksPickerIcon"
+    else
+      icon, icon_hl = " ", "DiagnosticError"
+    end
     ret[#ret + 1] = { icon .. " ", icon_hl, virtual = true }
     local short = vim.fn.fnamemodify(item.config_path, ":~")
     local dir = vim.fn.fnamemodify(short, ":h")
@@ -74,7 +79,7 @@ function M.pick(opts)
 
   Snacks.picker.pick(vim.tbl_deep_extend("force", {
     title   = "Mise Config Files",
-    finder  = items,
+    finder  = function() return items end,
     format  = format,
     preview = "preview",
     matcher = { fuzzy = true, smartcase = true },
