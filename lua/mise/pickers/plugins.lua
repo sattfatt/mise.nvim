@@ -153,6 +153,7 @@ local function _pick(mode, caller_opts)
     actions = actions,
     win = {
       input = {
+        footer_keys = true,
         keys = {
           ["<CR>"]  = { confirm_action,    mode = { "n", "i" }, desc = mode == "remote" and "Install" or "Update" },
           ["<C-i>"] = { "plugin_install",  mode = { "n", "i" }, desc = "Install plugin" },

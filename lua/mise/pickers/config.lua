@@ -84,7 +84,7 @@ function M.pick(opts)
     preview = "preview",
     matcher = { fuzzy = true, smartcase = true },
     actions = actions,
-    win = { input = { keys = {
+    win = { input = { footer_keys = true, keys = {
       ["<C-t>"] = { "mise_trust",   mode = { "n", "i" }, desc = "Trust config" },
       ["<C-u>"] = { "mise_untrust", mode = { "n", "i" }, desc = "Revoke trust" },
     }}},

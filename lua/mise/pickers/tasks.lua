@@ -64,23 +64,15 @@ function M.pick(opts)
   ---@type snacks.picker.format
   local function format(item, _picker)
     local ret = {}
-    local scope_icon = item.is_global and "G" or "L"
-    local scope_hl   = item.is_global and "SnacksPickerComment" or "DiagnosticHint"
-    ret[#ret + 1] = { "[" .. scope_icon .. "] ", scope_hl, virtual = true }
-    local parts = vim.split(item.task_name, ":", { plain = true })
-    for i, part in ipairs(parts) do
-      if i < #parts then
-        ret[#ret + 1] = { part, "SnacksPickerDir" }
-        ret[#ret + 1] = { ":", "Comment", virtual = true }
-      else
-        ret[#ret + 1] = { part, "SnacksPickerLabel" }
-      end
+    -- Global/local badge
+    if item.is_global then
+      ret[#ret + 1] = { "global ", "SnacksPickerComment", virtual = true }
     end
+    -- Task name as a single field entry so the matcher highlights it correctly
+    ret[#ret + 1] = { item.task_name, "SnacksPickerLabel", field = "text" }
+    -- Description dimmed
     if item.description ~= "" then
       ret[#ret + 1] = { "  " .. item.description, "SnacksPickerComment" }
-    end
-    if #item.depends > 0 then
-      ret[#ret + 1] = { "  [deps:" .. #item.depends .. "]", "Comment", virtual = true }
     end
     return ret
   end
@@ -133,7 +125,7 @@ function M.pick(opts)
     preview = "preview",
     matcher = { fuzzy = true, smartcase = true },
     actions = actions,
-    win = { input = { keys = {
+    win = { input = { footer_keys = true, keys = {
       ["<CR>"]  = { confirm_action, mode = { "n", "i" }, desc = "Run task" },
       ["<C-r>"] = { "mise_run",     mode = { "n", "i" }, desc = "Run task" },
       ["<C-w>"] = { "mise_watch",   mode = { "n", "i" }, desc = "Watch task" },

@@ -119,7 +119,7 @@ function M.pick(opts)
     preview = "preview",
     matcher = { fuzzy = true, smartcase = true },
     actions = actions,
-    win = { input = { keys = {
+    win = { input = { footer_keys = true, keys = {
       ["<C-i>"] = { "mise_install",   mode = { "n", "i" }, desc = "Install" },
       ["<C-x>"] = { "mise_uninstall", mode = { "n", "i" }, desc = "Uninstall" },
       ["<C-u>"] = { "mise_upgrade",   mode = { "n", "i" }, desc = "Upgrade" },

@@ -143,6 +143,7 @@ function M.pick(opts)
     actions = actions,
     win = {
       input = {
+        footer_keys = true,
         keys = {
           ["<CR>"]  = { confirm_action,        mode = { "n", "i" }, desc = "Install latest" },
           ["<C-i>"] = { "mise_install_latest", mode = { "n", "i" }, desc = "Install latest" },

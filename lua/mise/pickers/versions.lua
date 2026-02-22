@@ -133,6 +133,7 @@ function M.pick(opts)
     actions = actions,
     win = {
       input = {
+        footer_keys = true,
         keys = {
           ["<CR>"]  = { "mise_use",     mode = { "n", "i" }, desc = "Use this version (mise use)" },
           ["<C-i>"] = { "mise_install", mode = { "n", "i" }, desc = "Install only" },

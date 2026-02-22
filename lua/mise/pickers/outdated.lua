@@ -97,7 +97,7 @@ function M.pick(opts)
     preview = "preview",
     matcher = { fuzzy = true, smartcase = true },
     actions = actions,
-    win = { input = { keys = {
+    win = { input = { footer_keys = true, keys = {
       ["<CR>"]  = { "mise_upgrade", mode = { "n", "i" }, desc = "Upgrade selected tool" },
       ["<C-a>"] = { "upgrade_all",  mode = { "n", "i" }, desc = "Upgrade all tools" },
       ["<C-e>"] = { "edit_source",  mode = { "n", "i" }, desc = "Edit source config" },
