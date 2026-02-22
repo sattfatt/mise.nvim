@@ -57,26 +57,42 @@ function M.has_snacks()
   return _has_snacks
 end
 
---- Return the effective cwd for mise commands.
---- Uses the current buffer's directory as the anchor point so that mise
---- picks up the correct mise.toml even when Neovim's global cwd differs
---- from the file being edited (e.g. nvim opened from a different dir).
+--- Find the best anchor directory for resolving mise config.
+--- The current buffer may be a picker/terminal with no file path,
+--- so we walk listed buffers (most-recently-created first) to find
+--- a real file buffer to anchor from.
 ---@return string
-function M.cwd()
-  local cfg = require("mise.config").get()
-
-  -- Prefer the current buffer's directory as the search anchor.
-  -- Fall back to the window-local cwd, then the global cwd.
-  local bufname = vim.api.nvim_buf_get_name(0)
-  local anchor
-  if bufname ~= "" then
-    anchor = vim.fn.fnamemodify(bufname, ":h")
-  else
-    anchor = vim.fn.getcwd(0)
+local function _best_anchor()
+  -- Current buffer first
+  local cur = vim.api.nvim_buf_get_name(0)
+  if cur ~= "" and vim.fn.filereadable(cur) == 1 then
+    return vim.fn.fnamemodify(cur, ":h")
   end
 
-  -- Always search upward from the anchor for a mise config file.
-  -- This ensures mise finds the right config regardless of Neovim's cwd.
+  -- Walk all listed buffers in reverse (highest bufnr = most recently created)
+  local bufs = vim.api.nvim_list_bufs()
+  for i = #bufs, 1, -1 do
+    local b = bufs[i]
+    if vim.api.nvim_buf_is_valid(b) and vim.bo[b].buflisted then
+      local name = vim.api.nvim_buf_get_name(b)
+      if name ~= "" and vim.fn.filereadable(name) == 1 then
+        return vim.fn.fnamemodify(name, ":h")
+      end
+    end
+  end
+
+  -- Last resort: window-local cwd
+  return vim.fn.getcwd(0)
+end
+
+--- Return the effective cwd for mise commands.
+--- Anchors from the nearest real file buffer so mise finds the correct
+--- mise.toml even when Neovim's global cwd differs from the edited project
+--- or when the active buffer is a picker/terminal with no file path.
+---@return string
+function M.cwd()
+  local anchor = _best_anchor()
+
   local found = vim.fs.find(
     { "mise.toml", ".mise.toml", "mise.local.toml", ".tool-versions" },
     { upward = true, path = anchor }
@@ -85,7 +101,6 @@ function M.cwd()
     return vim.fn.fnamemodify(found[1], ":h")
   end
 
-  -- No mise config found upward — use the anchor itself
   return anchor
 end
 
