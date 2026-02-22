@@ -72,6 +72,8 @@ end
 --- Called automatically when mise.toml is saved.
 function M.invalidate_cache()
   _cache = {}
+  -- Also clear the resolved binary path in case mise_path config changed
+  require("mise.util")._mise_bin = nil
 end
 
 --- Return tool names matching arglead, for command completion.

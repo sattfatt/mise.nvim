@@ -14,9 +14,13 @@ describe("mise.util", function()
       assert.equals("/custom/mise", util.mise_bin())
     end)
 
-    it("returns 'mise' by default", function()
+    it("returns a non-empty string by default", function()
       local util = require("mise.util")
-      assert.equals("mise", util.mise_bin())
+      local bin = util.mise_bin()
+      assert.is_string(bin)
+      assert.is_true(#bin > 0)
+      -- Should resolve to an absolute path or a known name
+      assert.is_true(bin == "mise" or bin:find("/mise$") ~= nil or bin:find("\\mise") ~= nil)
     end)
   end)
 

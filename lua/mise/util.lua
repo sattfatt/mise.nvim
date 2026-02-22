@@ -1,11 +1,45 @@
 local M = {}
 
 local _has_snacks = nil ---@type boolean?
+local _mise_bin = nil  ---@type string?
 
---- Return the mise binary path from config.
+--- Return the resolved mise binary path.
+--- Resolves the configured path (default "mise") to a full absolute path
+--- so that vim.system / uv.spawn can find it even when Neovim's PATH
+--- doesn't include the shell-function wrappers (e.g. GUI launch).
 ---@return string
 function M.mise_bin()
-  return require("mise.config").get().mise_path
+  if _mise_bin then
+    return _mise_bin
+  end
+  local configured = require("mise.config").get().mise_path
+  -- If already absolute, use as-is
+  if configured:sub(1, 1) == "/" then
+    _mise_bin = configured
+    return _mise_bin
+  end
+  -- Try to resolve via exepath (searches $PATH as Neovim sees it)
+  local resolved = vim.fn.exepath(configured)
+  if resolved ~= "" then
+    _mise_bin = resolved
+    return _mise_bin
+  end
+  -- Fallback: common install locations
+  local fallbacks = {
+    vim.fn.expand("~/.local/bin/mise"),
+    "/opt/homebrew/bin/mise",
+    "/usr/local/bin/mise",
+    "/usr/bin/mise",
+  }
+  for _, path in ipairs(fallbacks) do
+    if vim.fn.executable(path) == 1 then
+      _mise_bin = path
+      return _mise_bin
+    end
+  end
+  -- Last resort: return configured name and let it fail naturally
+  _mise_bin = configured
+  return _mise_bin
 end
 
 --- Check if mise binary exists and is executable.
