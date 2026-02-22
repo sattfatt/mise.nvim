@@ -24,20 +24,35 @@ function M.has_snacks()
 end
 
 --- Return the effective cwd for mise commands.
---- Searches up for mise.toml if config.cwd == "root".
+--- Uses the current buffer's directory as the anchor point so that mise
+--- picks up the correct mise.toml even when Neovim's global cwd differs
+--- from the file being edited (e.g. nvim opened from a different dir).
 ---@return string
 function M.cwd()
   local cfg = require("mise.config").get()
-  if cfg.cwd == "root" then
-    local found = vim.fs.find(
-      { "mise.toml", ".mise.toml", "mise.local.toml", ".tool-versions" },
-      { upward = true, path = vim.fn.getcwd() }
-    )
-    if found[1] then
-      return vim.fn.fnamemodify(found[1], ":h")
-    end
+
+  -- Prefer the current buffer's directory as the search anchor.
+  -- Fall back to the window-local cwd, then the global cwd.
+  local bufname = vim.api.nvim_buf_get_name(0)
+  local anchor
+  if bufname ~= "" then
+    anchor = vim.fn.fnamemodify(bufname, ":h")
+  else
+    anchor = vim.fn.getcwd(0)
   end
-  return vim.fn.getcwd()
+
+  -- Always search upward from the anchor for a mise config file.
+  -- This ensures mise finds the right config regardless of Neovim's cwd.
+  local found = vim.fs.find(
+    { "mise.toml", ".mise.toml", "mise.local.toml", ".tool-versions" },
+    { upward = true, path = anchor }
+  )
+  if found[1] then
+    return vim.fn.fnamemodify(found[1], ":h")
+  end
+
+  -- No mise config found upward — use the anchor itself
+  return anchor
 end
 
 --- Notify using vim.notify with mise prefix.
