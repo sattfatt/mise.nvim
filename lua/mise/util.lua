@@ -57,42 +57,14 @@ function M.has_snacks()
   return _has_snacks
 end
 
---- Find the best anchor directory for resolving mise config.
---- The current buffer may be a picker/terminal with no file path,
---- so we walk listed buffers (most-recently-created first) to find
---- a real file buffer to anchor from.
----@return string
-local function _best_anchor()
-  -- Current buffer first
-  local cur = vim.api.nvim_buf_get_name(0)
-  if cur ~= "" and vim.fn.filereadable(cur) == 1 then
-    return vim.fn.fnamemodify(cur, ":h")
-  end
-
-  -- Walk all listed buffers in reverse (highest bufnr = most recently created)
-  local bufs = vim.api.nvim_list_bufs()
-  for i = #bufs, 1, -1 do
-    local b = bufs[i]
-    if vim.api.nvim_buf_is_valid(b) and vim.bo[b].buflisted then
-      local name = vim.api.nvim_buf_get_name(b)
-      if name ~= "" and vim.fn.filereadable(name) == 1 then
-        return vim.fn.fnamemodify(name, ":h")
-      end
-    end
-  end
-
-  -- Last resort: window-local cwd
-  return vim.fn.getcwd(0)
-end
-
 --- Return the effective cwd for mise commands.
---- Anchors from the nearest real file buffer so mise finds the correct
---- mise.toml even when Neovim's global cwd differs from the edited project
---- or when the active buffer is a picker/terminal with no file path.
+--- Searches upward from the given path (or vim's cwd) for a mise config file.
+--- Always call this before opening a picker so the result is captured while
+--- the user's buffer is still current.
+---@param path? string  Directory to start searching from (default: vim.fn.getcwd())
 ---@return string
-function M.cwd()
-  local anchor = _best_anchor()
-
+function M.cwd(path)
+  local anchor = path or vim.fn.getcwd()
   local found = vim.fs.find(
     { "mise.toml", ".mise.toml", "mise.local.toml", ".tool-versions" },
     { upward = true, path = anchor }
@@ -100,7 +72,6 @@ function M.cwd()
   if found[1] then
     return vim.fn.fnamemodify(found[1], ":h")
   end
-
   return anchor
 end
 

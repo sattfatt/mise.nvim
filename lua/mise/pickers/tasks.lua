@@ -13,13 +13,12 @@ function M.pick(opts)
   local util = require("mise.util")
   local cfg = require("mise.config").get()
   opts = vim.tbl_deep_extend("force", cfg.pickers.tasks or {}, opts or {})
+  local cwd = util.cwd()
 
   local default_action = opts.default_action or "run"
 
   ---@type snacks.picker.finder
   local function finder(_opts, _ctx)
-    -- Capture cwd synchronously before entering the async callback
-    local cwd = util.cwd()
     return function(cb)
       local stdout, _, code = util.run({ "tasks", "ls", "--json" }, { cwd = cwd })
       if code ~= 0 then
