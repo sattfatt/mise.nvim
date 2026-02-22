@@ -64,12 +64,14 @@ function M.pick(opts)
   ---@type snacks.picker.format
   local function format(item, _picker)
     local ret = {}
-    -- Global/local badge
+    -- Global/local scope icon
     if item.is_global then
-      ret[#ret + 1] = { "global ", "SnacksPickerComment", virtual = true }
+      ret[#ret + 1] = { " 󰘆 ", "DiagnosticHint", virtual = true }  -- globe
+    else
+      ret[#ret + 1] = { "   ", "SnacksPickerComment", virtual = true } -- indent for alignment
     end
-    -- Task name as a single field entry so the matcher highlights it correctly
-    ret[#ret + 1] = { item.task_name, "SnacksPickerLabel", field = "text" }
+    -- Task name: use Normal so match highlights (SnacksPickerMatch) stand out on top
+    ret[#ret + 1] = { item.task_name, "Normal", field = "text" }
     -- Description dimmed
     if item.description ~= "" then
       ret[#ret + 1] = { "  " .. item.description, "SnacksPickerComment" }
