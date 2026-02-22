@@ -84,10 +84,17 @@ function M.pick(opts)
     preview = "preview",
     matcher = { fuzzy = true, smartcase = true },
     actions = actions,
-    win = { input = { footer_keys = true, keys = {
-      ["<C-t>"] = { "mise_trust",   mode = { "n", "i" }, desc = "Trust config" },
-      ["<C-u>"] = { "mise_untrust", mode = { "n", "i" }, desc = "Revoke trust" },
-    }}},
+    win = { input = {
+      footer = pickers.make_footer({
+        ["<C-t>"] = { desc = "Trust" },
+        ["<C-u>"] = { desc = "Untrust" },
+      }),
+      footer_pos = "left",
+      keys = {
+        ["<C-t>"] = { "mise_trust",   mode = { "n", "i" }, desc = "Trust config" },
+        ["<C-u>"] = { "mise_untrust", mode = { "n", "i" }, desc = "Revoke trust" },
+      },
+    }},
   }, opts))
 end
 

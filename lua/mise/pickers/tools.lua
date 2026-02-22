@@ -119,13 +119,23 @@ function M.pick(opts)
     preview = "preview",
     matcher = { fuzzy = true, smartcase = true },
     actions = actions,
-    win = { input = { footer_keys = true, keys = {
-      ["<C-i>"] = { "mise_install",   mode = { "n", "i" }, desc = "Install" },
-      ["<C-x>"] = { "mise_uninstall", mode = { "n", "i" }, desc = "Uninstall" },
-      ["<C-u>"] = { "mise_upgrade",   mode = { "n", "i" }, desc = "Upgrade" },
-      ["<C-v>"] = { "mise_versions",  mode = { "n", "i" }, desc = "Browse versions" },
-      ["<C-y>"] = { "yank_spec",      mode = { "n", "i" }, desc = "Yank tool@version" },
-    }}},
+    win = { input = {
+      footer = pickers.make_footer({
+        ["<C-i>"] = { desc = "Install" },
+        ["<C-x>"] = { desc = "Uninstall" },
+        ["<C-u>"] = { desc = "Upgrade" },
+        ["<C-v>"] = { desc = "Versions" },
+        ["<C-y>"] = { desc = "Yank" },
+      }),
+      footer_pos = "left",
+      keys = {
+        ["<C-i>"] = { "mise_install",   mode = { "n", "i" }, desc = "Install" },
+        ["<C-x>"] = { "mise_uninstall", mode = { "n", "i" }, desc = "Uninstall" },
+        ["<C-u>"] = { "mise_upgrade",   mode = { "n", "i" }, desc = "Upgrade" },
+        ["<C-v>"] = { "mise_versions",  mode = { "n", "i" }, desc = "Browse versions" },
+        ["<C-y>"] = { "yank_spec",      mode = { "n", "i" }, desc = "Yank tool@version" },
+      },
+    }},
   }, opts))
 end
 

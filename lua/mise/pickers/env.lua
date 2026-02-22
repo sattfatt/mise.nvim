@@ -91,11 +91,19 @@ function M.pick(opts)
     preview = "preview",
     matcher = { fuzzy = true, smartcase = true },
     actions = actions,
-    win = { input = { footer_keys = true, keys = {
-      ["<CR>"]  = { "yank_value",      mode = { "n", "i" }, desc = "Yank value" },
-      ["<C-y>"] = { "yank_pair",       mode = { "n", "i" }, desc = "Yank KEY=VALUE" },
-      ["<C-e>"] = { "edit_env_config", mode = { "n", "i" }, desc = "Edit in mise.toml" },
-    }}},
+    win = { input = {
+      footer = pickers.make_footer({
+        ["<CR>"]  = { desc = "Yank value" },
+        ["<C-y>"] = { desc = "Yank KEY=VAL" },
+        ["<C-e>"] = { desc = "Edit config" },
+      }),
+      footer_pos = "left",
+      keys = {
+        ["<CR>"]  = { "yank_value",      mode = { "n", "i" }, desc = "Yank value" },
+        ["<C-y>"] = { "yank_pair",       mode = { "n", "i" }, desc = "Yank KEY=VALUE" },
+        ["<C-e>"] = { "edit_env_config", mode = { "n", "i" }, desc = "Edit in mise.toml" },
+      },
+    }},
   }, opts))
 end
 

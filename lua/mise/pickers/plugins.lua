@@ -153,14 +153,20 @@ local function _pick(mode, caller_opts)
     actions = actions,
     win = {
       input = {
-        footer_keys = true,
+        footer = pickers.make_footer({
+          ["<CR>"]  = { desc = mode == "remote" and "Install" or "Update" },
+          ["<C-x>"] = { desc = "Uninstall" },
+          ["<C-t>"] = { desc = mode == "remote" and "Installed" or "Remote" },
+          ["<C-y>"] = { desc = "Yank" },
+        }),
+        footer_pos = "left",
         keys = {
-          ["<CR>"]  = { confirm_action,    mode = { "n", "i" }, desc = mode == "remote" and "Install" or "Update" },
-          ["<C-i>"] = { "plugin_install",  mode = { "n", "i" }, desc = "Install plugin" },
-          ["<C-x>"] = { "plugin_uninstall",mode = { "n", "i" }, desc = "Uninstall plugin" },
-          ["<C-u>"] = { "plugin_update",   mode = { "n", "i" }, desc = "Update plugin" },
-          ["<C-t>"] = { "toggle_remote",   mode = { "n", "i" }, desc = mode == "remote" and "Show installed" or "Show remote" },
-          ["<C-y>"] = { "yank_name",       mode = { "n", "i" }, desc = "Yank plugin name" },
+          ["<CR>"]  = { confirm_action,     mode = { "n", "i" }, desc = mode == "remote" and "Install" or "Update" },
+          ["<C-i>"] = { "plugin_install",   mode = { "n", "i" }, desc = "Install plugin" },
+          ["<C-x>"] = { "plugin_uninstall", mode = { "n", "i" }, desc = "Uninstall plugin" },
+          ["<C-u>"] = { "plugin_update",    mode = { "n", "i" }, desc = "Update plugin" },
+          ["<C-t>"] = { "toggle_remote",    mode = { "n", "i" }, desc = mode == "remote" and "Show installed" or "Show remote" },
+          ["<C-y>"] = { "yank_name",        mode = { "n", "i" }, desc = "Yank plugin name" },
         },
       },
     },

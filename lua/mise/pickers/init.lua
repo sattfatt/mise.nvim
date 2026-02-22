@@ -103,6 +103,50 @@ function M.confirm(prompt, on_confirm)
   end
 end
 
+--- Build a compact highlighted footer from a keys table.
+--- Pass the same keys table you give to win.input.keys.
+--- Returns a {text, hl}[] array suitable for win.input.footer.
+---
+--- Keys are sorted, <CR> is always shown first (as "↵"), then the rest.
+--- Example output:  ↵ Run   ^r Run   ^w Watch   ^e Edit   ^y Yank
+---
+---@param keys table<string, table>  e.g. { ["<CR>"] = {"action", mode=…, desc="Foo"} }
+---@return table  snacks-compatible footer highlights array
+function M.make_footer(keys)
+  -- Normalise a lhs string to a short human-readable form.
+  local function short(lhs)
+    lhs = lhs:gsub("<CR>",  "↵")
+    lhs = lhs:gsub("<C%-", "^")
+    lhs = lhs:gsub(">",    "")
+    return lhs
+  end
+
+  -- Collect entries: { lhs_short, desc }
+  local entries = {}
+  for lhs, def in pairs(keys) do
+    -- def is { "action_name", mode=…, desc="…" }  (positional + named fields)
+    local desc = def.desc or def[1] or lhs
+    entries[#entries + 1] = { key = lhs, short = short(lhs), desc = desc }
+  end
+
+  -- Sort: <CR> first, then alphabetically by lhs
+  table.sort(entries, function(a, b)
+    if a.key == "<CR>" then return true end
+    if b.key == "<CR>" then return false end
+    return a.key < b.key
+  end)
+
+  local footer = {}
+  for i, e in ipairs(entries) do
+    if i > 1 then
+      footer[#footer + 1] = { "  ", "SnacksFooter" }
+    end
+    footer[#footer + 1] = { " " .. e.short .. " ", "SnacksFooterKey" }
+    footer[#footer + 1] = { e.desc,                "SnacksFooterDesc" }
+  end
+  return footer
+end
+
 --- Format a tool name, splitting backend prefix from tool name.
 --- "cargo:git-branchless" → { backend = "cargo", name = "git-branchless" }
 ---@param tool_key string

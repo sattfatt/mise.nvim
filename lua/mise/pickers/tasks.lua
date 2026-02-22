@@ -125,14 +125,24 @@ function M.pick(opts)
     preview = "preview",
     matcher = { fuzzy = true, smartcase = true },
     actions = actions,
-    win = { input = { footer_keys = true, keys = {
-      ["<CR>"]  = { confirm_action, mode = { "n", "i" }, desc = "Run task" },
-      ["<C-r>"] = { "mise_run",     mode = { "n", "i" }, desc = "Run task" },
-      ["<C-w>"] = { "mise_watch",   mode = { "n", "i" }, desc = "Watch task" },
-      ["<C-e>"] = { "edit_source",  mode = { "n", "i" }, desc = "Edit source" },
-      ["<C-y>"] = { "yank_name",    mode = { "n", "i" }, desc = "Yank task name" },
-      ["<C-d>"] = { "show_deps",    mode = { "n", "i" }, desc = "Show dependencies" },
-    }}},
+    win = { input = {
+      footer = pickers.make_footer({
+        ["<CR>"]  = { desc = "Run" },
+        ["<C-w>"] = { desc = "Watch" },
+        ["<C-e>"] = { desc = "Edit" },
+        ["<C-y>"] = { desc = "Yank" },
+        ["<C-d>"] = { desc = "Deps" },
+      }),
+      footer_pos = "left",
+      keys = {
+        ["<CR>"]  = { confirm_action, mode = { "n", "i" }, desc = "Run task" },
+        ["<C-r>"] = { "mise_run",     mode = { "n", "i" }, desc = "Run task" },
+        ["<C-w>"] = { "mise_watch",   mode = { "n", "i" }, desc = "Watch task" },
+        ["<C-e>"] = { "edit_source",  mode = { "n", "i" }, desc = "Edit source" },
+        ["<C-y>"] = { "yank_name",    mode = { "n", "i" }, desc = "Yank task name" },
+        ["<C-d>"] = { "show_deps",    mode = { "n", "i" }, desc = "Show dependencies" },
+      },
+    }},
   }, opts))
 end
 

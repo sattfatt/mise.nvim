@@ -97,12 +97,21 @@ function M.pick(opts)
     preview = "preview",
     matcher = { fuzzy = true, smartcase = true },
     actions = actions,
-    win = { input = { footer_keys = true, keys = {
-      ["<CR>"]  = { "mise_upgrade", mode = { "n", "i" }, desc = "Upgrade selected tool" },
-      ["<C-a>"] = { "upgrade_all",  mode = { "n", "i" }, desc = "Upgrade all tools" },
-      ["<C-e>"] = { "edit_source",  mode = { "n", "i" }, desc = "Edit source config" },
-      ["<C-y>"] = { "yank_cmd",     mode = { "n", "i" }, desc = "Yank upgrade command" },
-    }}},
+    win = { input = {
+      footer = pickers.make_footer({
+        ["<CR>"]  = { desc = "Upgrade" },
+        ["<C-a>"] = { desc = "Upgrade all" },
+        ["<C-e>"] = { desc = "Edit" },
+        ["<C-y>"] = { desc = "Yank cmd" },
+      }),
+      footer_pos = "left",
+      keys = {
+        ["<CR>"]  = { "mise_upgrade", mode = { "n", "i" }, desc = "Upgrade selected tool" },
+        ["<C-a>"] = { "upgrade_all",  mode = { "n", "i" }, desc = "Upgrade all tools" },
+        ["<C-e>"] = { "edit_source",  mode = { "n", "i" }, desc = "Edit source config" },
+        ["<C-y>"] = { "yank_cmd",     mode = { "n", "i" }, desc = "Yank upgrade command" },
+      },
+    }},
   }, opts))
 end
 

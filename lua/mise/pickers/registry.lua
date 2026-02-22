@@ -143,7 +143,13 @@ function M.pick(opts)
     actions = actions,
     win = {
       input = {
-        footer_keys = true,
+        footer = pickers.make_footer({
+          ["<CR>"]  = { desc = "Install" },
+          ["<C-u>"] = { desc = "Use" },
+          ["<C-v>"] = { desc = "Versions" },
+          ["<C-y>"] = { desc = "Yank" },
+        }),
+        footer_pos = "left",
         keys = {
           ["<CR>"]  = { confirm_action,        mode = { "n", "i" }, desc = "Install latest" },
           ["<C-i>"] = { "mise_install_latest", mode = { "n", "i" }, desc = "Install latest" },
