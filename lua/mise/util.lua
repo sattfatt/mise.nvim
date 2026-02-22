@@ -184,21 +184,35 @@ function M.run_task(task_name, watch)
   local cmd_name = watch and "watch" or "run"
   local cmd = { M.mise_bin(), cmd_name, task_name }
   local cwd = M.cwd()
+  local cfg = require("mise.config").get()
 
   if M.has_snacks() then
     local Snacks = require("snacks")
     if Snacks.terminal then
-      Snacks.terminal(cmd, { cwd = cwd })
+      -- Map plugin split config to Snacks win position
+      local position
+      if cfg.terminal.split == "vertical" then
+        position = "right"
+      elseif cfg.terminal.split == "float" then
+        position = "float"
+      else
+        position = "bottom" -- horizontal (default)
+      end
+      Snacks.terminal(cmd, {
+        cwd = cwd,
+        win = {
+          position = position,
+          height = cfg.terminal.height,
+          width = cfg.terminal.width,
+        },
+      })
       return
     end
   end
 
   -- Fallback: native terminal in a split
-  local cfg = require("mise.config").get()
   if cfg.terminal.split == "vertical" then
     vim.cmd("vsplit")
-  elseif cfg.terminal.split == "float" then
-    vim.cmd("split")
   else
     vim.cmd("split")
     vim.cmd("resize " .. cfg.terminal.height)
