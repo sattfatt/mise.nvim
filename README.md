@@ -1,5 +1,7 @@
 # mise-nvim
 
+> **Disclaimer** Heavily AI generated. Some things may not work (if I haven't yet used the feature much)
+
 A comprehensive Neovim plugin for [mise](https://mise.jdx.dev) — the polyglot dev environment manager.
 
 Deep integration with [snacks.nvim](https://github.com/folke/snacks.nvim) picker for browsing tools, tasks, environments, and more.
