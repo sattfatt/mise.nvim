@@ -4,6 +4,29 @@ function M.setup()
   local util = require("mise.util")
   local mise = require("mise")
 
+  -- :MiseDebug — show runtime diagnostics
+  vim.api.nvim_create_user_command("MiseDebug", function()
+    local bin = util.mise_bin()
+    local cwd = util.cwd()
+    local stdout, stderr, code = util.run({ "--version" })
+    local lines = {
+      "mise_bin: " .. bin,
+      "cwd(): " .. cwd,
+      "vim.fn.getcwd(): " .. vim.fn.getcwd(),
+      "run --version code: " .. tostring(code),
+      "run --version stdout: " .. vim.trim(stdout),
+      "run --version stderr: " .. vim.trim(stderr),
+    }
+    -- also test ls --json
+    local ls_out, ls_err, ls_code = util.run({ "ls", "--json" }, { cwd = cwd })
+    table.insert(lines, "ls --json code: " .. tostring(ls_code))
+    table.insert(lines, "ls --json stdout len: " .. #ls_out)
+    if ls_err ~= "" then
+      table.insert(lines, "ls --json stderr: " .. vim.trim(ls_err))
+    end
+    vim.notify(table.concat(lines, "\n"), vim.log.levels.INFO, { title = "MiseDebug" })
+  end, { desc = "Show mise-nvim runtime diagnostics" })
+
   -- Helper: open a picker or run a direct command
   local function picker_or_run(picker_fn, direct_fn, arg)
     arg = arg and vim.trim(arg) or ""
