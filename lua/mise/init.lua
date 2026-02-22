@@ -8,6 +8,9 @@ local _cache = {} ---@type table<string, any>
 ---@param opts? MiseConfig
 function M.setup(opts)
   require("mise.config").setup(opts)
+  -- Resolve and cache the mise binary path on the main thread now,
+  -- so util.mise_bin() never needs to call Vimscript from a fast context.
+  require("mise.util").mise_bin()
   require("mise.commands").setup()
   require("mise.autocmd").setup()
 end

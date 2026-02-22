@@ -64,7 +64,8 @@ end
 ---@param path? string  Directory to start searching from (default: vim.fn.getcwd())
 ---@return string
 function M.cwd(path)
-  local anchor = path or vim.fn.getcwd()
+  local uv = vim.uv or vim.loop
+  local anchor = path or uv.cwd() or "."
   local found = vim.fs.find(
     { "mise.toml", ".mise.toml", "mise.local.toml", ".tool-versions" },
     { upward = true, path = anchor }
@@ -96,24 +97,24 @@ function M.json_decode(str)
 end
 
 --- Synchronously run a mise command.
---- Returns stdout, stderr, exit_code.
---- Uses vim.fn.system (vimscript) so it works safely inside coroutines
---- (vim.system():wait() can deadlock inside libuv-based async schedulers).
+--- Always call from the main thread — never from inside a picker finder.
 ---@param args string[]
 ---@param opts? {cwd?: string, env?: table}
 ---@return string stdout, string stderr, number code
 function M.run(args, opts)
   local bin = M.mise_bin()
   opts = opts or {}
-  local cwd = opts.cwd or M.cwd()
-
-  -- Build a shell command with explicit cd so cwd is honoured by vim.fn.system
-  local escaped = vim.tbl_map(vim.fn.shellescape, vim.list_extend({ bin }, args))
-  local cmd = "cd " .. vim.fn.shellescape(cwd) .. " && " .. table.concat(escaped, " ")
-
-  local stdout = vim.fn.system(cmd)
-  local code = vim.v.shell_error
-  return stdout, "", code
+  local ok, result = pcall(function()
+    return vim.system(vim.list_extend({ bin }, args), {
+      cwd  = opts.cwd or M.cwd(),
+      env  = opts.env,
+      text = true,
+    }):wait()
+  end)
+  if not ok then
+    return "", tostring(result), 127
+  end
+  return result.stdout or "", result.stderr or "", result.code
 end
 
 --- Asynchronously run a mise command.
