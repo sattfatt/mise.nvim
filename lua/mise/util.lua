@@ -200,6 +200,7 @@ function M.run_task(task_name, watch)
       end
       Snacks.terminal(cmd, {
         cwd = cwd,
+        auto_close = false,
         win = {
           position = position,
           height = cfg.terminal.height,
